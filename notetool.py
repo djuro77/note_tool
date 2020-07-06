@@ -46,10 +46,14 @@ def command_always_on_top():
 root = tk.Tk()
 
 mainframe = tk.Frame(root)
-mainframe.pack()
+mainframe.grid(row=0)
+text_frame = tk.Frame(root)
+text_frame.grid(row=1)
 
-S = tk.Scrollbar(mainframe)
-T = tk.Text(mainframe)
+
+
+S = tk.Scrollbar(text_frame)
+T = tk.Text(text_frame)
 B = tk.Button(mainframe, text="Copy", command=note_to_clipboard)
 S.config(command=T.yview)
 T.config(yscrollcommand=S.set)
@@ -57,7 +61,7 @@ var_always_on_top = tk.IntVar()
 ckbox_always_on_top = tk.Checkbutton(mainframe, text="Always on top", variable=var_always_on_top, command=command_always_on_top)
 B.grid(row=0, column=0)
 ckbox_always_on_top.grid(row=0, column=1)
-S.grid(row=1)
-T.grid(row=1)
+S.pack(side=tk.RIGHT, fill=tk.Y)
+T.pack(side=tk.LEFT, fill=tk.Y)
 
 root.mainloop()
