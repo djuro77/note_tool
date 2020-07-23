@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['notetool.py'],
-             pathex=['C:\\Users\\ivand\\Desktop\\NoteTool'],
+             pathex=['C:\\Users\\ivand\\Desktop\\NoteTool\\version'],
              binaries=[],
              datas=[],
              hiddenimports=[],
