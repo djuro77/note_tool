@@ -3,18 +3,16 @@ from pynput.keyboard import Key, Listener
 import pyperclip
 import tkinter as tk
 from threading import Thread
+from tkinter import messagebox
+
 
 # TODO:
+# work on dumps: copy & dump clear yes/no only if no dumps else info
+# Need Unit Tests!
 
 ### Change log:
-# root.title added
-# label_current_var -- "current" typo fixed
-# prevented adding a new line on insert after note change -->  _new_button_return
-#       if text.get('end-1c', 'end') == '\n':
-#           text.delete('end-1c', 'end')
-# note buttons change appearance when selected
-# debug enable/disable
-
+# YesNoMsgBox added for the Clear Function
+# Dumps init -- only FRONTEND changes
 
 
 ### DEBUG
@@ -23,7 +21,13 @@ def log(message):
     if logging is True:
         print(message)
 
+
+
+
+
 ###   KEY LISTENER   ###
+# -- starts key listener in the the new thread
+
 alt_count = 0
 
 def on_release(key):
@@ -49,6 +53,7 @@ thread_listener.start()
 
 
 ## Note Class
+
 class Note:
     """Main class for Note objects -- intended to store generalised data"""
 
@@ -82,7 +87,11 @@ def command_always_on_top():
 
 
 def command_clear():
-    text.delete("1.0", tk.END)
+    YesNoMsgBox = tk.messagebox.askquestion ('Clear Current Note','NO DUMP! Clear current Note?',icon = 'warning')
+    log(f"* User input YES/NO? Clear = {YesNoMsgBox}")
+    if YesNoMsgBox == "yes":
+        log
+        text.delete("1.0", tk.END)
 
 
 def command_delete():
@@ -123,12 +132,12 @@ def _new_button_return(note):
 
 def command_newNote():
     """Actions when 'New' button is clicked"""
-
     global next_note
     global note_buttons
     next_note += 1
     # create new note object
     note = Note(title=str(next_note), content="")
+    log(f"Note: {note.title} created +\n")
     # create new button and display it in notes_frame
     button = tk.Button(notes_frame, text=note.title, bg='white', width=6, command=lambda n=note: _new_button_return(n))
     button.grid(row=0, column=next_note, sticky="wn", padx=1)
@@ -143,6 +152,8 @@ root.title("AdminNotes")
 root.grid_columnconfigure(0,weight=1) # the text and entry frames column
 root.grid_rowconfigure(2,weight=1) # all frames row
 
+
+# Frames
 mainframe = tk.Frame(root)
 mainframe.grid(row=0, column=0, sticky="new")
 mainframe.grid_columnconfigure(4,weight=1) # the text and entry frames column
@@ -152,16 +163,17 @@ text_frame = tk.Frame(root)
 text_frame.grid(row=2, column=0, sticky="nswe")
 text_frame.grid_columnconfigure(0,weight=1) # the entry and text widgets column
 text_frame.grid_rowconfigure(0,weight=1) # the text widgets row
+
 # mainframe Widgets
-widOpt_MainFrameButtons = {"width":10}
+widOpt_MainFrameButtons = {"width":12}
 girdOpt_MainFrameButtons = {"sticky":"nw", "padx":2}
 label_current_var = tk.StringVar()
 label_current = tk.Label(mainframe, bg="grey", textvariable=label_current_var, width=10)
 label_current.grid(row=0, column=0, sticky=tk.W, padx=20)
-button_copy = tk.Button(mainframe, **widOpt_MainFrameButtons, text="Copy", command=note_to_clipboard)
+button_copy = tk.Button(mainframe, **widOpt_MainFrameButtons, bg="green", text="Copy & Dump", command=note_to_clipboard)
 button_copy.grid(row=0, column=1, **girdOpt_MainFrameButtons)
-button_clear = tk.Button(mainframe, **widOpt_MainFrameButtons, text="New", command=command_newNote)
-button_clear.grid(row=0, column=2, **girdOpt_MainFrameButtons)
+button_new = tk.Button(mainframe, **widOpt_MainFrameButtons, text="New", command=command_newNote)
+button_new.grid(row=0, column=2, **girdOpt_MainFrameButtons)
 button_clear = tk.Button(mainframe, bg="red", **widOpt_MainFrameButtons, text="Clear", command=command_clear)
 button_clear.grid(row=0, column=3, **girdOpt_MainFrameButtons)
 button_delete = tk.Button(mainframe, state="disabled", **widOpt_MainFrameButtons, text="Delete", command=command_delete)
@@ -169,6 +181,7 @@ button_delete.grid(row=0, column=4, **girdOpt_MainFrameButtons)
 var_always_on_top = tk.IntVar()
 ckbox_always_on_top = tk.Checkbutton(mainframe, text="Always on top", variable=var_always_on_top, command=command_always_on_top)
 ckbox_always_on_top.grid(row=0, column=5, sticky='e')
+
 # text_frame Widgets
 yscrollbar = tk.Scrollbar(text_frame)
 yscrollbar.grid(row=0, column=1, sticky="nse")
