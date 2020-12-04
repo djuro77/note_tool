@@ -22,7 +22,8 @@ def log(message):
         print(message)
 
 
-
+## number of allowd elements in each note's history list
+hist_control = 50
 
 
 ###   KEY LISTENER   ###
@@ -60,6 +61,9 @@ class Note:
     def __init__(self, title=None, content=None):
         self.title = title
         self.content = content
+        self.history = []
+        self.history_position = -1
+
 
     def get_frontendData(self):
         """returns JSON formated data"""
@@ -67,6 +71,7 @@ class Note:
         "title": self.title,
         "content": self.content
         }
+
 
 
 ###   FRONTEND   ###
@@ -146,6 +151,38 @@ def command_newNote():
     _new_button_return(note)
 
 
+def history_call(event):
+    log(f"what is : {current_note.history_position}")
+
+    current_note.history.append(text.get("1.0", tk.END))
+    log(f"{current_note.history}")
+
+    if len(current_note.history) >= hist_control:
+        del(current_note.history[0])
+        log(f"truncating history for {current_note.title}")
+
+def command_undo():
+    if abs(current_note.history_position) <= len(current_note.history):
+        log("\nUNDO\n")
+        # remove current data
+        text.delete("1.0", tk.END)
+        # insert previous from history
+        text.insert(tk.END, f"{current_note.history[current_note.history_position]}")
+        current_note.history_position -= 1
+        log(current_note.history_position)
+
+
+def command_redo():
+    if current_note.history_position is not -1:
+        log("\nREDO\n")
+        # remove current data
+        text.delete("1.0", tk.END)
+        # insert previous from history
+        current_note.history_position += 1
+        text.insert(tk.END, f"{current_note.history[current_note.history_position]}")
+        log(current_note.history_position)
+
+
 ## Start MainLoop
 root = tk.Tk()
 root.title("AdminNotes")
@@ -166,21 +203,28 @@ text_frame.grid_rowconfigure(0,weight=1) # the text widgets row
 
 # mainframe Widgets
 widOpt_MainFrameButtons = {"width":12}
-girdOpt_MainFrameButtons = {"sticky":"nw", "padx":2}
+girdOpt_MainFrameButtons = {"row":0, "sticky":"nw", "padx":2}
+
 label_current_var = tk.StringVar()
 label_current = tk.Label(mainframe, bg="grey", textvariable=label_current_var, width=10)
 label_current.grid(row=0, column=0, sticky=tk.W, padx=20)
+
 button_copy = tk.Button(mainframe, **widOpt_MainFrameButtons, bg="green", text="Copy & Dump", command=note_to_clipboard)
-button_copy.grid(row=0, column=1, **girdOpt_MainFrameButtons)
+button_copy.grid(column=1, **girdOpt_MainFrameButtons)
 button_new = tk.Button(mainframe, **widOpt_MainFrameButtons, text="New", command=command_newNote)
-button_new.grid(row=0, column=2, **girdOpt_MainFrameButtons)
+button_new.grid(column=2, **girdOpt_MainFrameButtons)
 button_clear = tk.Button(mainframe, bg="red", **widOpt_MainFrameButtons, text="Clear", command=command_clear)
-button_clear.grid(row=0, column=3, **girdOpt_MainFrameButtons)
+button_clear.grid(column=3, **girdOpt_MainFrameButtons)
 button_delete = tk.Button(mainframe, state="disabled", **widOpt_MainFrameButtons, text="Delete", command=command_delete)
-button_delete.grid(row=0, column=4, **girdOpt_MainFrameButtons)
+button_delete.grid(column=4, **girdOpt_MainFrameButtons)
+button_undo = tk.Button(mainframe, **widOpt_MainFrameButtons, text="↺", command=command_undo)
+button_undo.grid(column=5, **girdOpt_MainFrameButtons)
+button_redo = tk.Button(mainframe, **widOpt_MainFrameButtons, text="↻", command=command_redo)
+button_redo.grid(column=6, **girdOpt_MainFrameButtons)
+
 var_always_on_top = tk.IntVar()
 ckbox_always_on_top = tk.Checkbutton(mainframe, text="Always on top", variable=var_always_on_top, command=command_always_on_top)
-ckbox_always_on_top.grid(row=0, column=5, sticky='e')
+ckbox_always_on_top.grid(row=0, column=7, sticky='e')
 
 # text_frame Widgets
 yscrollbar = tk.Scrollbar(text_frame)
@@ -188,5 +232,8 @@ yscrollbar.grid(row=0, column=1, sticky="nse")
 text = tk.Text(text_frame, bd=0, yscrollcommand=yscrollbar.set)
 text.grid(row=0, column=0, sticky="nswe")
 yscrollbar.config(command=text.yview)
+
+# Text Widget events
+text.bind("<Key>", history_call)
 
 root.mainloop()
