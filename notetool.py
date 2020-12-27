@@ -188,7 +188,7 @@ def command_redo():
 
 ## Start MainLoop
 root = tk.Tk()
-root.title("AdminNotes")
+root.title("Note Tool")
 root.grid_columnconfigure(0,weight=1) # the text and entry frames column
 root.grid_rowconfigure(2,weight=1) # all frames row
 
