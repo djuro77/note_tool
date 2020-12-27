@@ -1,0 +1,14 @@
+## if venv <notetool_venv> present
+notetool_venv\Scripts\activate
+
+# OR
+##  install requirements
+pip install -r requirements.txt
+
+## test app 
+python notetool.py
+
+## compile with pyinstller
+pyinstaller --noconsole --onefile notetool.py
+
+

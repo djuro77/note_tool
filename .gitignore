@@ -1,5 +1,4 @@
-notetool_venv
+venv
 build
 notetool.spec
-build.txt
 __pycache__

@@ -30,16 +30,21 @@ hist_control = 50
 # -- starts key listener in the the new thread
 
 alt_count = 0
-
 def on_release(key):
     global alt_count
     if key == Key.alt_r:
         alt_count += 1
         if alt_count == 3:
+            # paste what is in clipboard to note
             new_part = pyperclip.paste()
             text.insert(tk.END, f"{new_part}\n\n")
             # reset alt_count for a new round
             alt_count = 0
+            # save history
+            history_call("note pasted")
+
+
+
     else:
         alt_count = 0
 
@@ -152,8 +157,6 @@ def command_newNote():
 
 
 def history_call(event):
-    log(f"what is : {current_note.history_position}")
-
     current_note.history.append(text.get("1.0", tk.END))
     log(f"{current_note.history}")
 
